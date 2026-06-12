@@ -6,6 +6,7 @@ import {
   extractOg,
   ScrapeError,
   safeFetch,
+  readBodyWithLimit,
 } from "@/lib/scrape";
 
 vi.mock("node:dns/promises", () => ({
@@ -215,5 +216,28 @@ describe("safeFetch", () => {
     await expect(
       safeFetch("https://example.com/broken"),
     ).rejects.toMatchObject({ code: "blocked" });
+  });
+});
+
+describe("readBodyWithLimit", () => {
+  it("returns the full text when body is under the limit", async () => {
+    const res = new Response("hello world");
+    const text = await readBodyWithLimit(res, 100);
+    expect(text).toBe("hello world");
+  });
+
+  it("throws ScrapeError('blocked') when body exceeds the byte limit", async () => {
+    const body = "x".repeat(101);
+    const res = new Response(body);
+    await expect(readBodyWithLimit(res, 100)).rejects.toMatchObject({
+      code: "blocked",
+    });
+  });
+
+  it("throws ScrapeError('blocked') when Response body is null", async () => {
+    const res = new Response(null, { status: 200 });
+    await expect(readBodyWithLimit(res, 100)).rejects.toMatchObject({
+      code: "blocked",
+    });
   });
 });

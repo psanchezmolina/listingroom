@@ -152,6 +152,30 @@ const BROWSER_HEADERS = {
   Accept: "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
 };
 
+const MAX_HTML_BYTES = 5 * 1024 * 1024;
+
+export async function readBodyWithLimit(
+  res: Response,
+  maxBytes: number = MAX_HTML_BYTES,
+): Promise<string> {
+  const reader = res.body?.getReader();
+  if (!reader) throw new ScrapeError("blocked");
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) throw new ScrapeError("blocked");
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return Buffer.concat(chunks.map((c) => Buffer.from(c))).toString("utf-8");
+}
+
 export async function safeFetch(
   rawUrl: string,
   timeoutMs = 8000,
@@ -207,7 +231,7 @@ export async function scrapeProduct(rawUrl: string): Promise<ScrapedProduct> {
   }
   if (!res.ok) throw new ScrapeError("blocked");
 
-  const product = extractOg(await res.text(), url.toString());
+  const product = extractOg(await readBodyWithLimit(res), url.toString());
   if (!product) throw new ScrapeError("no_product");
   return product;
 }
