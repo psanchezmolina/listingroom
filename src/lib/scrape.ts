@@ -152,18 +152,31 @@ const BROWSER_HEADERS = {
   Accept: "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
 };
 
-export async function fetchWithTimeout(
-  url: string,
+export async function safeFetch(
+  rawUrl: string,
   timeoutMs = 8000,
+  maxRedirects = 5,
 ): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(url, {
-      headers: BROWSER_HEADERS,
-      signal: controller.signal,
-      redirect: "follow",
-    });
+    let currentUrl = rawUrl;
+    for (let hop = 0; hop <= maxRedirects; hop++) {
+      await assertPublicUrl(currentUrl);
+      const res = await fetch(currentUrl, {
+        headers: BROWSER_HEADERS,
+        signal: controller.signal,
+        redirect: "manual",
+      });
+      if (res.status >= 300 && res.status < 400) {
+        const location = res.headers.get("location");
+        if (!location) throw new ScrapeError("blocked");
+        currentUrl = new URL(location, currentUrl).toString();
+        continue;
+      }
+      return res;
+    }
+    throw new ScrapeError("blocked");
   } finally {
     clearTimeout(timer);
   }
@@ -176,7 +189,7 @@ export async function scrapeProduct(rawUrl: string): Promise<ScrapedProduct> {
   const jsonUrl = shopifyJsonUrl(url);
   if (jsonUrl) {
     try {
-      const res = await fetchWithTimeout(jsonUrl);
+      const res = await safeFetch(jsonUrl);
       if (res.ok && (res.headers.get("content-type") ?? "").includes("json")) {
         const mapped = mapShopifyProduct(await res.json(), url.toString());
         if (mapped) return mapped;
@@ -188,7 +201,7 @@ export async function scrapeProduct(rawUrl: string): Promise<ScrapedProduct> {
 
   let res: Response;
   try {
-    res = await fetchWithTimeout(url.toString());
+    res = await safeFetch(url.toString());
   } catch {
     throw new ScrapeError("blocked");
   }
@@ -218,7 +231,7 @@ export async function downloadImageAsBase64(
   }
   let res: Response;
   try {
-    res = await fetchWithTimeout(imageUrl);
+    res = await safeFetch(imageUrl);
   } catch {
     throw new ScrapeError("image_failed");
   }

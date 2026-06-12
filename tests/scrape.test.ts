@@ -1,11 +1,20 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import {
   isPrivateIp,
   shopifyJsonUrl,
   mapShopifyProduct,
   extractOg,
   ScrapeError,
+  safeFetch,
 } from "@/lib/scrape";
+
+vi.mock("node:dns/promises", () => ({
+  lookup: vi.fn().mockResolvedValue({ address: "93.184.216.34" }),
+}));
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("isPrivateIp", () => {
   it("flags private and loopback ranges", () => {
@@ -139,5 +148,72 @@ describe("extractOg", () => {
 describe("ScrapeError", () => {
   it("carries a code", () => {
     expect(new ScrapeError("blocked").code).toBe("blocked");
+  });
+});
+
+describe("safeFetch", () => {
+  it("returns a 200 response without redirects", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response("body", { status: 200 })),
+    );
+    const res = await safeFetch("https://example.com/page");
+    expect(res.status).toBe(200);
+  });
+
+  it("follows a redirect to a public URL and returns the final response", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn()
+        .mockResolvedValueOnce(
+          new Response(null, {
+            status: 301,
+            headers: { location: "https://example.com/final" },
+          }),
+        )
+        .mockResolvedValueOnce(new Response("ok", { status: 200 })),
+    );
+    const res = await safeFetch("https://example.com/original");
+    expect(res.status).toBe(200);
+  });
+
+  it("throws ScrapeError('invalid_url') when a redirect points to a private IP", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(null, {
+          status: 301,
+          headers: { location: "http://127.0.0.1/secret" },
+        }),
+      ),
+    );
+    await expect(safeFetch("https://example.com/trap")).rejects.toMatchObject({
+      code: "invalid_url",
+    });
+  });
+
+  it("throws ScrapeError('blocked') after exceeding max redirects", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(null, {
+          status: 301,
+          headers: { location: "https://example.com/loop" },
+        }),
+      ),
+    );
+    await expect(safeFetch("https://example.com/loop")).rejects.toMatchObject({
+      code: "blocked",
+    });
+  });
+
+  it("throws ScrapeError('blocked') when a redirect has no Location header", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(null, { status: 301 })),
+    );
+    await expect(
+      safeFetch("https://example.com/broken"),
+    ).rejects.toMatchObject({ code: "blocked" });
   });
 });
