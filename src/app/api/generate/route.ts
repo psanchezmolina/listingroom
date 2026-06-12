@@ -12,6 +12,7 @@ import {
   downloadImageAsBase64,
   ScrapeError,
 } from "@/lib/scrape";
+import { isValidBase64 } from "@/lib/validate";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -136,6 +137,9 @@ export async function POST(req: Request) {
   }
   if (imageBase64.length > MAX_BASE64_LENGTH) {
     return jsonError(413, "image_too_large", "Images must be under 5MB.");
+  }
+  if (!isValidBase64(imageBase64)) {
+    return jsonError(400, "invalid_image", "Please upload a JPEG, PNG, WebP or GIF image.");
   }
 
   try {
