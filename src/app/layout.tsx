@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ListingRoom — Turn a product photo into a ready-to-paste listing kit",
+  title: "ListingRoom | Turn a product photo into a ready-to-paste listing kit",
   description:
     "Free AI tool for e-commerce sellers: upload a product photo and get an SEO title, description, benefit bullets, ad copy, social caption and keywords in seconds.",
 };

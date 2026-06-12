@@ -73,6 +73,7 @@ export default function Home() {
   if (status === "result" && kit && resultImage) {
     return (
       <div className="flex min-h-screen flex-col bg-white">
+        <TopBar />
         <main className="flex-1">
           <ResultView
             imageSrc={resultImage}
@@ -99,23 +100,21 @@ export default function Home() {
   // idle | error
   return (
     <div className="flex min-h-screen flex-col bg-hero-gradient">
-      <main className="flex flex-1 items-start justify-center px-5 py-16 sm:py-24">
+      <TopBar />
+      <main className="flex flex-1 items-start justify-center px-5 py-8 sm:py-10">
         <div className="w-full max-w-xl">
           <header className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wide text-accent">
-              ListingRoom
-            </p>
-            <h1 className="mt-4 text-balance text-4xl font-semibold leading-[1.08] tracking-tight-hero text-ink sm:text-[52px] sm:leading-[1.05]">
+            <h1 className="text-balance text-4xl font-semibold leading-[1.08] tracking-tight-hero text-ink sm:text-[44px] sm:leading-[1.05]">
               Turn a product {mode === "photo" ? "photo" : "link"} into a
               ready-to-paste listing kit
             </h1>
-            <p className="mx-auto mt-5 max-w-lg text-[17px] leading-relaxed text-muted">
+            <p className="mx-auto mt-3 max-w-lg text-base leading-relaxed text-muted">
               SEO title, description, bullets, ad copy, caption and keywords,
               generated from your real product in seconds. Free.
             </p>
           </header>
 
-          <div className="mt-10 rounded-3xl border border-ink/10 bg-white/70 p-5 shadow-sm backdrop-blur-sm sm:p-7">
+          <div className="mt-6 rounded-3xl border border-ink/10 bg-white/70 p-5 shadow-sm backdrop-blur-sm sm:p-6">
             {error && (
               <div
                 role="alert"
@@ -158,12 +157,12 @@ export default function Home() {
               type="button"
               onClick={handleGenerate}
               disabled={generateDisabled}
-              className="mt-5 inline-flex w-full items-center justify-center rounded-btn bg-accent px-8 py-4 text-[16px] font-medium text-white transition-colors hover:bg-accent-dark disabled:cursor-not-allowed disabled:bg-accent/40"
+              className="mt-4 inline-flex w-full items-center justify-center rounded-btn bg-accent px-8 py-3.5 text-[16px] font-medium text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-sky disabled:text-sky-text"
             >
               Generate my listing kit
             </button>
 
-            <p className="mt-3 text-center text-xs text-muted">
+            <p className="mt-2.5 text-center text-xs text-muted">
               No sign-up required · Your photo never leaves the generation step.
             </p>
           </div>
@@ -174,9 +173,19 @@ export default function Home() {
   );
 }
 
+function TopBar() {
+  return (
+    <header className="bg-accent py-2.5 text-center">
+      <span className="text-sm font-semibold uppercase tracking-[0.18em] text-white">
+        ListingRoom
+      </span>
+    </header>
+  );
+}
+
 function Footer() {
   return (
-    <footer className="px-5 py-8 text-center text-xs text-muted">
+    <footer className="px-5 py-4 text-center text-xs text-muted">
       Made with ♥ by{" "}
       <a
         href="https://pablo.ky"

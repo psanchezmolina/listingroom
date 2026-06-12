@@ -39,7 +39,7 @@ export default function UrlInput({ value, onChange }: UrlInputProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="https://yourstore.com/products/…"
-        className="w-full max-w-md rounded-btn border border-ink/10 bg-white px-4 py-3 text-[15px] text-ink placeholder:text-muted transition-colors focus:border-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/15"
+        className="w-full max-w-md rounded-btn border border-ink/10 bg-white px-4 py-3 text-[15px] text-ink placeholder:text-muted transition-colors focus:border-sky-border focus:outline-none focus:ring-2 focus:ring-sky-border/30"
       />
     </div>
   );

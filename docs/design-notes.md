@@ -87,9 +87,9 @@ _Captured 2026-06-12 via Playwright against https://www.photoroom.com_
 |---|---|---|
 | `ink` | `#0A0A0A` | Adopt Photoroom's near-black. Use `#0A0A0A` instead of pure `#000000` for softer digital feel. |
 | `muted` | `#6B6B6B` | Direct lift from Photoroom's `rgb(107,107,107)`. |
-| `surface` | `#F5F3FF` | Diverge: use a very faint lavender tint (drawn from their hero gradient `#EEE5F6` but lighter) so ListingRoom feels adjacent without copying. |
-| `accent` | `#492FFB` | Direct lift from Photoroom's brand purple `rgb(73,47,251)`. This is the clearest brand signal and works as the primary action color. |
-| `accent-dark` | `#3520C8` | Darken `#492FFB` by ~15% for hover states. Keeps it in the same purple family. |
+| `surface` | `#F5F5F7` | Neutral light gray. (Was `#F5F3FF` lavender; changed 2026-06-12 to kill the lilac cast and read more premium.) |
+| `accent` | `#492FFB` | Direct lift from Photoroom's brand blue `rgb(73,47,251)`. This is the clearest brand signal and works as the primary action color. |
+| `accent-hover` | `#544FFF` | Photoroom's actual hover blue (slightly lighter than base). (Was `accent-dark: #3520C8`; changed 2026-06-12 to match Photoroom's real hover behavior.) |
 
 ### Where We Deliberately Diverge
 
@@ -120,7 +120,7 @@ Inter matches all of these characteristics. Its optical sizing at 16px body and 
 
 1. **Pill-adjacent buttons with generous horizontal padding.** The hero CTA has `64px` left/right padding and `56px` height — it breathes. Radius is `10px` (not fully pill, just rounded-lg). This gives weight without aggression. Use the same pattern for ListingRoom's primary "Generate listing" button.
 
-2. **Lavender gradient hero.** The page opens on `linear-gradient(to bottom-right, #EEE5F6, #FFFFFF, #F0E9F8)`. It signals "AI / creative tool" without being garish. ListingRoom's hero section should use a similar faint lavender-to-white gradient as the page background to establish the family connection.
+2. **Gradient hero.** Photoroom opens on `linear-gradient(to bottom-right, #EEE5F6, #FFFFFF, #F0E9F8)` (lavender). ListingRoom initially copied it but the lilac cast read as "AI app template"; changed 2026-06-12 to a faint blue-tinted gradient (`#EEF1FF → #FFFFFF → #F0F3FF`) aligned with the `#492FFB` accent family.
 
 3. **Pure black text on white, no gray-on-gray softness.** Headings are `#000000`. Photoroom commits to maximum legibility contrast. Muted text (`#6B6B6B`) is only used for sub-labels and supporting copy, never for primary content. Mirror this hierarchy strictly.
 

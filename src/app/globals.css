@@ -26,3 +26,18 @@ body {
 .animate-skeleton {
   animation: skeleton-pulse 1.4s ease-in-out infinite;
 }
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-modal-pop {
+  animation: modal-pop 0.18s ease-out;
+}

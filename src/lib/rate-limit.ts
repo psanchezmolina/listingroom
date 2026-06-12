@@ -1,5 +1,6 @@
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const MAX_REQUESTS = 10;
+const CLEANUP_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
 
 const hits = new Map<string, number[]>();
 
@@ -16,7 +17,26 @@ export function checkRateLimit(ip: string, now: number = Date.now()): boolean {
   return true;
 }
 
+/** Removes entries whose most recent request is older than the sliding window. */
+export function evictExpired(now: number = Date.now()): void {
+  const cutoff = now - WINDOW_MS;
+  for (const [ip, times] of hits) {
+    if (times[times.length - 1] <= cutoff) hits.delete(ip);
+  }
+}
+
+/** Test/diagnostic helper: number of IPs currently tracked. */
+export function rateLimitStoreSize(): number {
+  return hits.size;
+}
+
 /** Test helper. */
 export function resetRateLimit(): void {
   hits.clear();
+}
+
+// Prune stale entries every 10 minutes. .unref() so the timer does not
+// prevent the process from exiting cleanly in serverless environments.
+if (typeof setInterval !== "undefined") {
+  setInterval(() => evictExpired(), CLEANUP_INTERVAL_MS).unref();
 }

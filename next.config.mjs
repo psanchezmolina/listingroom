@@ -1,3 +1,6 @@
+// Next.js dev mode (react-refresh) requires eval; production stays strict.
+const isDev = process.env.NODE_ENV !== "production";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
@@ -22,7 +25,7 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'",
+              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "connect-src 'self'",

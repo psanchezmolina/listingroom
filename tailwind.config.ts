@@ -7,9 +7,12 @@ const config: Config = {
       colors: {
         ink: "#0A0A0A",
         muted: "#6B6B6B",
-        surface: "#F5F3FF",
+        surface: "#F5F5F7",
         accent: "#492FFB",
-        "accent-dark": "#3520C8",
+        "accent-hover": "#544FFF",
+        sky: "#EEF8FF",
+        "sky-border": "#A5CDF0",
+        "sky-text": "#7D9EBC",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
@@ -21,7 +24,7 @@ const config: Config = {
       },
       backgroundImage: {
         "hero-gradient":
-          "linear-gradient(to bottom right, #EEE5F6, #FFFFFF, #F0E9F8)",
+          "linear-gradient(to bottom right, #EEF8FF, #FFFFFF, #EEF8FF)",
       },
     },
   },

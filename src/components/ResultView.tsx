@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import type { ListingKit } from "@/lib/kit";
 import KitBlock from "./KitBlock";
+import PitchModal from "./PitchModal";
 
 interface ResultViewProps {
   imageSrc: string;
@@ -11,6 +13,8 @@ interface ResultViewProps {
 
 const PHOTOROOM_URL =
   "https://www.photoroom.com/?utm_source=listingroom&utm_medium=referral&utm_campaign=listing-kit";
+
+const PITCH_SEEN_KEY = "lr_pitch_seen";
 
 function capitalize(text: string): string {
   if (!text) return text;
@@ -22,6 +26,22 @@ export default function ResultView({
   kit,
   onStartOver,
 }: ResultViewProps) {
+  const [showPitch, setShowPitch] = useState(false);
+
+  function handlePhotoroomClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    let seen = true;
+    try {
+      seen = window.localStorage.getItem(PITCH_SEEN_KEY) === "1";
+      if (!seen) window.localStorage.setItem(PITCH_SEEN_KEY, "1");
+    } catch {
+      seen = false; // private mode: still show it once per page load
+    }
+    if (!seen) {
+      e.preventDefault();
+      setShowPitch(true);
+    }
+  }
+
   const descriptionParagraphs = kit.description
     .split(/\n\s*\n/)
     .map((p) => p.trim())
@@ -59,10 +79,10 @@ export default function ResultView({
                 href={PHOTOROOM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-btn bg-accent px-6 py-3.5 text-center text-[15px] font-medium text-white transition-colors hover:bg-accent-dark"
+                onClick={handlePhotoroomClick}
+                className="mt-5 inline-flex w-full items-center justify-center rounded-btn bg-accent px-6 py-3.5 text-center text-[15px] font-medium uppercase tracking-wide text-white transition-colors hover:bg-accent-hover"
               >
                 Open in Photoroom
-                <span aria-hidden="true">→</span>
               </a>
             </div>
 
@@ -148,6 +168,13 @@ export default function ResultView({
           </div>
         </div>
       </div>
+
+      {showPitch && (
+        <PitchModal
+          photoroomUrl={PHOTOROOM_URL}
+          onClose={() => setShowPitch(false)}
+        />
+      )}
     </div>
   );
 }

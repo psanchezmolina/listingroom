@@ -90,8 +90,8 @@ export default function UploadZone({ image, onImage, onError }: UploadZoneProps)
       className={[
         "group flex min-h-[220px] cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-colors",
         dragActive
-          ? "border-accent bg-accent/5"
-          : "border-ink/15 bg-white hover:border-accent/50 hover:bg-surface/60",
+          ? "border-sky-border bg-sky"
+          : "border-ink/15 bg-white hover:border-sky-border hover:bg-sky/50",
       ].join(" ")}
     >
       <input
@@ -120,7 +120,7 @@ export default function UploadZone({ image, onImage, onError }: UploadZoneProps)
         </>
       ) : (
         <>
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface transition-colors group-hover:bg-accent/10">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface transition-colors group-hover:bg-sky">
             <svg
               width="22"
               height="22"

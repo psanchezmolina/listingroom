@@ -38,23 +38,7 @@ export default function LoadingState() {
         </p>
       </div>
 
-      <div className="mt-10 space-y-4">
-        {[0, 1, 2].map((block) => (
-          <div
-            key={block}
-            className="rounded-2xl border border-ink/10 bg-white p-5"
-          >
-            <div className="animate-skeleton h-3 w-24 rounded bg-surface" />
-            <div className="mt-4 space-y-2.5">
-              <div className="animate-skeleton h-3.5 w-full rounded bg-surface" />
-              <div className="animate-skeleton h-3.5 w-[92%] rounded bg-surface" />
-              <div className="animate-skeleton h-3.5 w-[78%] rounded bg-surface" />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <p className="mt-8 text-center text-sm text-muted">
+      <p className="mt-4 text-center text-sm text-muted">
         This usually takes 15–30 seconds.
       </p>
     </div>
