@@ -1,6 +1,6 @@
 # ListingRoom
 
-Free web tool for e-commerce sellers: turn one product photo (or a product page URL) into a ready-to-paste listing kit in seconds.
+Writing the listing is the part every seller hates. ListingRoom does it from one product photo, in seconds, for free.
 
 Live: **[listingroom.pablo.ky](https://listingroom.pablo.ky)**
 
@@ -8,7 +8,7 @@ Live: **[listingroom.pablo.ky](https://listingroom.pablo.ky)**
 
 ## What it does
 
-Give ListingRoom a product and it writes the whole listing for you:
+Give it a product. It writes the whole listing:
 
 - **SEO title** (keyword front-loaded, 60-80 chars)
 - **Product description** (2-3 tight paragraphs)
@@ -22,18 +22,18 @@ Two ways in:
 - **Upload a photo.** Drag in a JPEG, PNG, WebP or GIF.
 - **Paste a URL.** Drop a product page link and ListingRoom pulls the image and existing copy for you.
 
-The result page has a single CTA: **Open in Photoroom**. The words are the free hook, the visual is the natural next step.
+The result page has a single CTA: **Open in Photoroom**. The words are the free hook. The visual is the natural next step.
 
 ## How it works
 
-The whole thing is one page, one API route, one Claude call.
+One page. One API route. One Claude call.
 
-- **One Claude call** to `claude-opus-4-8` with vision and a JSON schema response. The model reads the actual photo, so the copy describes the real product and never invents specs it cannot see. Structured outputs guarantee a parseable kit, every time.
-- **URL mode** tries Shopify's public `/products/<handle>.json` first, then falls back to Open Graph tags. Stores that block server requests (Amazon, Etsy) fail gracefully with a one-tap fallback to photo upload.
+- **The Claude call** goes to `claude-opus-4-8` with vision and a JSON schema response. The model reads the actual photo, so the copy describes the real product and never invents specs it cannot see.
+- **URL mode** tries Shopify's public `/products/<handle>.json` first, then falls back to Open Graph tags. Amazon and Etsy block server requests. The tool doesn't pretend otherwise: it tells you and offers photo upload instead.
 - **SSRF-guarded.** Private hosts and resolved private IPs are blocked, and scraped image URLs are re-validated before download.
 - **Abuse protection.** In-memory rate limit (10 generations per hour per IP), 5MB image cap, jpeg/png/webp/gif only.
 
-Deliberately **not** here: no database, no auth, no analytics, no tracking. The product is the output, not the user data.
+Deliberately **not** here: no database, no auth, no analytics, no tracking. The product is the output, not your data.
 
 ## Run it locally
 
@@ -59,6 +59,20 @@ docker compose up --build    # reads .env.local, serves on :3000
 
 ## Why this exists
 
-I built ListingRoom in one day as a growth-marketing portfolio piece for Photoroom. The thesis is simple: a free, genuinely useful word-tool is a low-friction top of funnel. Sellers come for copy they would otherwise pay for, finish with a product photo that obviously needs cleaning up, and hand off into Photoroom to do it: a free hook that loops into a visual handoff and a natural referral. Phase-two levers are obvious without overpromising: programmatic SEO category pages to compound the organic surface, funnel analytics to measure the handoff, and a scraping API to cover Amazon and Etsy URLs that block direct requests. The design language intentionally echoes Photoroom (ink `#0A0A0A`, accent `#492FFB`, Inter, generous whitespace), extracted from photoroom.com.
+I built ListingRoom in one day, as a growth-marketing portfolio piece for Photoroom.
+
+The thesis is simple. Sellers need listing copy before they need anything else. Give them that for free, from their real product, and the next step is obvious: the photo. That's Photoroom.
+
+The trick isn't the AI. It's the handoff.
+
+A few honest decisions along the way:
+
+1. **No Amazon/Etsy scraping.** They block server requests. Faking it with a scraping API was possible but added cost and fragility to a one-day build, so the tool says so and falls back to photo upload.
+2. **No analytics in v1.** The funnel I would measure (upload → generate → copy → CTA click) is designed, not shipped. Shipping the loop mattered more than instrumenting it on day one.
+3. **One model call, not a pipeline.** Vision plus structured outputs in a single request keeps it fast, cheap (about $0.05 per kit) and hard to break.
+
+Phase two is where this gets interesting: programmatic SEO category pages to compound the organic surface, funnel analytics to measure the handoff, a scraping API to cover Amazon and Etsy.
+
+The design language intentionally echoes Photoroom (ink `#0A0A0A`, accent `#492FFB`, Inter, generous whitespace), extracted from photoroom.com itself.
 
 Made with ♥ for Photoroom by Pablo Sánchez. Not affiliated with Photoroom.
