@@ -27,11 +27,14 @@ Rules:
 - Bullets: exactly 5, each leading with a benefit, max ~15 words each.
 - Ad copy: exactly 3 variants with different angles (e.g. emotional, practical, social proof style). 1-2 sentences each.
 - Social caption: one caption, warm tone, light emoji, 1-2 hashtags.
-- Keywords: 10-15 lowercase keywords/phrases buyers would actually search.`;
+- Keywords: 10-15 lowercase keywords/phrases buyers would actually search.
+- Never use dashes as punctuation anywhere in the kit: no em dashes (—) and no hyphens used as separators (like "Mug - 12oz" or "quality - guaranteed"). Use commas, periods, colons or parentheses instead, including in the title. Hyphens inside compound words (hand-painted, eco-friendly) are fine.`;
 
 export interface ScrapedContext {
   title?: string;
   description?: string;
+  brand?: string;
+  siteName?: string;
   url?: string;
 }
 
@@ -44,14 +47,22 @@ export function buildInstruction(input: InstructionInput): string {
   const parts = [
     "Create the complete listing kit for the product in this photo.",
   ];
-  if (input.scraped && (input.scraped.title || input.scraped.description)) {
+  const scraped = input.scraped;
+  if (scraped && (scraped.title || scraped.description || scraped.brand || scraped.siteName)) {
     parts.push(
       `For reference, here is the product's original listing (improve on it, don't copy it):\n` +
-        (input.scraped.title ? `Original title: ${input.scraped.title}\n` : "") +
-        (input.scraped.description
-          ? `Original description: ${input.scraped.description}`
+        (scraped.brand ? `Brand: ${scraped.brand}\n` : "") +
+        (scraped.siteName ? `Store: ${scraped.siteName}\n` : "") +
+        (scraped.title ? `Original title: ${scraped.title}\n` : "") +
+        (scraped.description
+          ? `Original description: ${scraped.description}`
           : ""),
     );
+    if (scraped.brand) {
+      parts.push(
+        "Use the brand name naturally where it strengthens the copy, especially front-loaded in the title.",
+      );
+    }
   }
   if (input.extraContext && input.extraContext.trim() !== "") {
     parts.push(`Seller-provided context: ${input.extraContext.trim()}`);

@@ -23,11 +23,11 @@ const MAX_CONTEXT_LENGTH = 500;
 const SCRAPE_MESSAGES: Record<string, string> = {
   invalid_url: "That doesn't look like a public product page URL.",
   blocked:
-    "This store blocks automated access. Try uploading a photo instead.",
+    "This store blocks automated access (Amazon and Etsy do this), and covering them is out of scope for this demo. Upload a photo instead, it works just as well.",
   no_product:
-    "We couldn't find a product image on that page. Try uploading a photo instead.",
+    "We couldn't read that page. Big marketplaces like Amazon and Etsy block automated access, and covering them is out of scope for this demo. Upload a photo instead, it works just as well.",
   image_failed:
-    "We couldn't fetch the product image from that page. Try uploading a photo instead.",
+    "We couldn't fetch the product image from that page. Upload a photo instead, it works just as well.",
 };
 
 function jsonError(status: number, code: string, message: string) {
@@ -103,6 +103,8 @@ export async function POST(req: Request) {
         scraped: {
           title: product.title,
           description: product.description,
+          brand: product.brand,
+          siteName: product.siteName,
           url: product.sourceUrl,
         },
       });

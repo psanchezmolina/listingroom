@@ -106,7 +106,8 @@ export default function Home() {
               ListingRoom
             </p>
             <h1 className="mt-4 text-balance text-4xl font-semibold leading-[1.08] tracking-tight-hero text-ink sm:text-[52px] sm:leading-[1.05]">
-              Turn a product photo into a ready-to-paste listing kit
+              Turn a product {mode === "photo" ? "photo" : "link"} into a
+              ready-to-paste listing kit
             </h1>
             <p className="mx-auto mt-5 max-w-lg text-[17px] leading-relaxed text-muted">
               SEO title, description, bullets, ad copy, caption and keywords,
@@ -176,7 +177,16 @@ export default function Home() {
 function Footer() {
   return (
     <footer className="px-5 py-8 text-center text-xs text-muted">
-      Made with ♥ for Photoroom · Not affiliated with Photoroom
+      Made with ♥ by{" "}
+      <a
+        href="https://pablo.ky"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-medium text-ink underline-offset-2 transition-colors hover:text-accent hover:underline"
+      >
+        Pablo Sánchez
+      </a>{" "}
+      to join the Photoroom Growth team · Not affiliated with Photoroom
     </footer>
   );
 }

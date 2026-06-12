@@ -23,4 +23,12 @@ describe("buildInstruction", () => {
     expect(text).toContain("Old title");
     expect(text).toContain("Old desc");
   });
+
+  it("includes the scraped brand and store name when provided", () => {
+    const text = buildInstruction({
+      scraped: { brand: "Mug Co.", siteName: "Mug Store" },
+    });
+    expect(text).toContain("Brand: Mug Co.");
+    expect(text).toContain("Store: Mug Store");
+  });
 });

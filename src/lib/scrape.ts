@@ -18,6 +18,8 @@ export class ScrapeError extends Error {
 export interface ScrapedProduct {
   title?: string;
   description?: string;
+  brand?: string;
+  siteName?: string;
   imageUrl: string;
   sourceUrl: string;
 }
@@ -83,12 +85,47 @@ export function mapShopifyProduct(
   if (!imageUrl) return null;
   const bodyHtml = typeof product.body_html === "string" ? product.body_html : "";
   const description = cheerio.load(bodyHtml).text().trim() || undefined;
+  const vendor = typeof product.vendor === "string" ? product.vendor.trim() : "";
   return {
     title: typeof product.title === "string" ? product.title : undefined,
     description,
+    brand: vendor || undefined,
     imageUrl,
     sourceUrl,
   };
+}
+
+/** Pulls the brand name out of JSON-LD Product schema blocks, if present. */
+function extractJsonLdBrand($: cheerio.CheerioAPI): string | undefined {
+  for (const el of $('script[type="application/ld+json"]').toArray()) {
+    let data: unknown;
+    try {
+      data = JSON.parse($(el).text());
+    } catch {
+      continue;
+    }
+    const graph = (data as { "@graph"?: unknown[] } | null)?.["@graph"];
+    const nodes: unknown[] = Array.isArray(data)
+      ? data
+      : Array.isArray(graph)
+        ? graph
+        : [data];
+    for (const node of nodes) {
+      if (typeof node !== "object" || node === null) continue;
+      const n = node as Record<string, unknown>;
+      const type = n["@type"];
+      const isProduct =
+        type === "Product" || (Array.isArray(type) && type.includes("Product"));
+      if (!isProduct) continue;
+      const brand = n.brand;
+      if (typeof brand === "string" && brand.trim()) return brand.trim();
+      if (typeof brand === "object" && brand !== null) {
+        const name = (brand as Record<string, unknown>).name;
+        if (typeof name === "string" && name.trim()) return name.trim();
+      }
+    }
+  }
+  return undefined;
 }
 
 export function extractOg(html: string, sourceUrl: string): ScrapedProduct | null {
@@ -101,6 +138,8 @@ export function extractOg(html: string, sourceUrl: string): ScrapedProduct | nul
   return {
     title: meta("og:title") ?? ($("title").text().trim() || undefined),
     description: meta("og:description") ?? meta("description"),
+    brand: extractJsonLdBrand($),
+    siteName: meta("og:site_name"),
     imageUrl,
     sourceUrl,
   };

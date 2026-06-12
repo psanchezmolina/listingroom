@@ -35,12 +35,13 @@ describe("shopifyJsonUrl", () => {
 });
 
 describe("mapShopifyProduct", () => {
-  it("maps the Shopify product JSON shape", () => {
+  it("maps the Shopify product JSON shape including the vendor as brand", () => {
     const out = mapShopifyProduct(
       {
         product: {
           title: "Blue Mug",
           body_html: "<p>A <strong>nice</strong> mug</p>",
+          vendor: "Mug Co.",
           images: [{ src: "https://cdn.shopify.com/mug.jpg" }],
         },
       },
@@ -49,9 +50,23 @@ describe("mapShopifyProduct", () => {
     expect(out).toEqual({
       title: "Blue Mug",
       description: "A nice mug",
+      brand: "Mug Co.",
       imageUrl: "https://cdn.shopify.com/mug.jpg",
       sourceUrl: "https://shop.example.com/products/blue-mug",
     });
+  });
+  it("leaves brand undefined without a vendor", () => {
+    const out = mapShopifyProduct(
+      {
+        product: {
+          title: "X",
+          body_html: "",
+          images: [{ src: "https://cdn.shopify.com/x.jpg" }],
+        },
+      },
+      "u",
+    );
+    expect(out?.brand).toBeUndefined();
   });
   it("returns null when there is no image", () => {
     expect(
@@ -66,15 +81,45 @@ describe("extractOg", () => {
     <meta property="og:title" content="OG Mug" />
     <meta property="og:description" content="The best mug" />
     <meta property="og:image" content="https://cdn.example.com/og.jpg" />
+    <meta property="og:site_name" content="Mug Store" />
   </head><body></body></html>`;
 
-  it("extracts og tags", () => {
+  it("extracts og tags including the site name", () => {
     expect(extractOg(html, "https://x.com/p")).toEqual({
       title: "OG Mug",
       description: "The best mug",
+      siteName: "Mug Store",
       imageUrl: "https://cdn.example.com/og.jpg",
       sourceUrl: "https://x.com/p",
     });
+  });
+
+  it("extracts the brand from JSON-LD Product schema", () => {
+    const ld = `<html><head>
+      <meta property="og:image" content="https://cdn.example.com/og.jpg" />
+      <script type="application/ld+json">
+        {"@context":"https://schema.org","@type":"Product","name":"Mug","brand":{"@type":"Brand","name":"Mug Co."}}
+      </script>
+    </head></html>`;
+    expect(extractOg(ld, "u")?.brand).toBe("Mug Co.");
+  });
+
+  it("extracts a string brand from JSON-LD inside @graph", () => {
+    const ld = `<html><head>
+      <meta property="og:image" content="https://cdn.example.com/og.jpg" />
+      <script type="application/ld+json">
+        {"@graph":[{"@type":"WebSite"},{"@type":"Product","brand":"Mug Co."}]}
+      </script>
+    </head></html>`;
+    expect(extractOg(ld, "u")?.brand).toBe("Mug Co.");
+  });
+
+  it("ignores malformed JSON-LD", () => {
+    const ld = `<html><head>
+      <meta property="og:image" content="https://cdn.example.com/og.jpg" />
+      <script type="application/ld+json">{not valid json</script>
+    </head></html>`;
+    expect(extractOg(ld, "u")?.brand).toBeUndefined();
   });
 
   it("falls back to twitter:image and <title>", () => {
