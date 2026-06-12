@@ -30,8 +30,8 @@ One page. One API route. One Claude call.
 
 - **The Claude call** goes to `claude-opus-4-8` with vision and a JSON schema response. The model reads the actual photo, so the copy describes the real product and never invents specs it cannot see.
 - **URL mode** tries Shopify's public `/products/<handle>.json` first, then falls back to Open Graph tags. Amazon and Etsy block server requests. The tool doesn't pretend otherwise: it tells you and offers photo upload instead.
-- **SSRF-guarded.** Private hosts and resolved private IPs are blocked, and scraped image URLs are re-validated before download.
-- **Abuse protection.** In-memory rate limit (10 generations per hour per IP), 5MB image cap, jpeg/png/webp/gif only.
+- **SSRF-guarded.** Private hosts and resolved private IPs are rejected before every request, including on each redirect hop. HTML responses are capped at 5 MB. Scraped image URLs are re-validated before download.
+- **Abuse protection.** In-memory rate limit (3 generations per hour per IP), 5 MB image cap, jpeg/png/webp/gif only, base64 payload validated before it reaches the model.
 
 Deliberately **not** here: no database, no auth, no analytics, no tracking. The product is the output, not your data.
 
