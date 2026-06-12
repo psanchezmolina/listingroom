@@ -20,9 +20,9 @@ export function checkRateLimit(ip: string, now: number = Date.now()): boolean {
 /** Removes entries whose most recent request is older than the sliding window. */
 export function evictExpired(now: number = Date.now()): void {
   const cutoff = now - WINDOW_MS;
-  for (const [ip, times] of hits) {
+  hits.forEach((times, ip) => {
     if (times[times.length - 1] <= cutoff) hits.delete(ip);
-  }
+  });
 }
 
 /** Test/diagnostic helper: number of IPs currently tracked. */
