@@ -81,13 +81,13 @@ Before building the UI, open photoroom.com with Playwright and extract its visua
 
 ## Build order (protects the ship)
 
-- **Block A (first, gets deployed):** complete photo MVP end to end, live on photoroom.pablo.ky.
+- **Block A (first, gets deployed):** complete photo MVP end to end, live on listingroom.pablo.ky.
 - **Block B (same day, on top of deployed):** URL input mode. If time runs out, what's deployed is never broken.
 
 ## Delivery
 
 - Public GitHub repo, English README: what it is, screenshot/GIF, how to run (local + Docker), architecture note.
-- Dockerfile + docker-compose → Easypanel on Contabo → photoroom.pablo.ky.
+- Dockerfile + docker-compose → Easypanel on Contabo → listingroom.pablo.ky.
 - Final verification against the live public URL (real behavior, not just build success).
 
 ## Phase 2 (documented, NOT built — material for the application)
